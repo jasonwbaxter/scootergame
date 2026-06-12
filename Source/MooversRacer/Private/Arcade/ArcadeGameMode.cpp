@@ -10,8 +10,9 @@ AArcadeGameMode::AArcadeGameMode()
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.TickInterval = 0.016f; // 60 FPS
 
-	// Use arcade scooter as default pawn
-	DefaultPawnClass = ArcadeScooterClass;
+	// Note: DefaultPawnClass should be set in Blueprint or Editor using EditDefaultsOnly property
+	// Don't set it here as ArcadeScooterClass will not be initialized yet
+	// DefaultPawnClass = ArcadeScooterClass;
 }
 
 void AArcadeGameMode::BeginPlay()
@@ -66,6 +67,13 @@ void AArcadeGameMode::InitializeArcade()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	ArcadeManager = GetWorld()->SpawnActor<AArcadeRaceManager>(SpawnParams);
+	
+	// Validate manager was created
+	if (!ArcadeManager)
+	{
+		UE_LOG(LogTemp, Error, TEXT("AArcadeGameMode: Failed to spawn ArcadeManager!"));
+		return;
+	}
 
 	// Get player scooter
 	for (TActorIterator<AArcadeScooterPawn> ActorItr(GetWorld()); ActorItr; ++ActorItr)
@@ -73,15 +81,39 @@ void AArcadeGameMode::InitializeArcade()
 		PlayerScooter = *ActorItr;
 		break;
 	}
+	
+	if (!PlayerScooter)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AArcadeGameMode: No player scooter found in level!"));
+	}
 
 	// Create and show arcade HUD
 	if (ArcadeHUDClass)
 	{
-		ArcadeHUD = CreateWidget<UArcadeHUD>(GetWorld()->GetFirstPlayerController(), ArcadeHUDClass);
-		if (ArcadeHUD)
+		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+		if (PlayerController)
 		{
-			ArcadeHUD->AddToViewport();
-			ArcadeHUD->SetArcadeManager(ArcadeManager);
+			ArcadeHUD = CreateWidget<UArcadeHUD>(PlayerController, ArcadeHUDClass);
+			if (ArcadeHUD)
+			{
+				ArcadeHUD->AddToViewport();
+				if (ArcadeManager)
+				{
+					ArcadeHUD->SetArcadeManager(ArcadeManager);
+				}
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("AArcadeGameMode: Failed to create ArcadeHUD widget!"));
+			}
 		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AArcadeGameMode: No player controller found!"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AArcadeGameMode: ArcadeHUDClass not set in editor!"));
 	}
 }

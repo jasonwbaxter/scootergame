@@ -170,11 +170,28 @@ void AArcadeRaceManager::CheckGameOver()
 		return;
 	}
 
-	if (PlayerScooter && !PlayerScooter->GetWorld()->FindFirstPlayerController()->IsValid())
+	// Check if player controller is still valid
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	if (!PlayerController || !PlayerController->IsValid())
 	{
 		EndGame();
+		return;
+	}
+
+	// Check if player scooter exists and is alive
+	if (!PlayerScooter)
+	{
+		// Player scooter not found - game should have already ended
+		EndGame();
+		return;
 	}
 
 	// Check if player health is 0
-	// (This will be implemented once we connect arcade physics)
+	if (PlayerScooter->GetPhysicsComponent())
+	{
+		if (!PlayerScooter->GetPhysicsComponent()->IsAlive())
+		{
+			EndGame();
+		}
+	}
 }

@@ -103,8 +103,11 @@ void AScooterPawn::Move(const FInputActionValue& Value)
 		// Find forward direction
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
-		const FVector ForwardDirection = FRotm(YawRotation).GetUnitAxis(EAxis::X);
-		const FVector RightDirection = FRotm(YawRotation).GetUnitAxis(EAxis::Y);
+		
+		// Use FRotationMatrix for proper rotation transformation
+		const FMatrix RotationMatrix = FRotationTranslationMatrix(YawRotation, FVector::ZeroVector);
+		const FVector ForwardDirection = RotationMatrix.GetScaledAxis(EAxis::X);
+		const FVector RightDirection = RotationMatrix.GetScaledAxis(EAxis::Y);
 
 		// Pass to physics component
 		if (PhysicsComponent)

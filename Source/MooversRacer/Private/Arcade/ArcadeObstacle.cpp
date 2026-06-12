@@ -53,6 +53,25 @@ void AArcadeObstacle::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, 
 
 void AArcadeObstacle::DespawnIfBehindPlayer()
 {
-	// TODO: Check if obstacle is behind player, then destroy
-	// This will be implemented once we have player position tracking
+	// Check if this obstacle is far behind the player and should be destroyed
+	// This prevents memory leaks from accumulating obstacles
+	AArcadeScooterPawn* PlayerScooter = nullptr;
+	
+	// Find the player scooter
+	for (TActorIterator<AArcadeScooterPawn> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		PlayerScooter = *ActorItr;
+		break;
+	}
+
+	if (PlayerScooter)
+	{
+		float DistanceFromPlayer = (GetActorLocation().X - PlayerScooter->GetActorLocation().X);
+		
+		// If obstacle is far behind player, destroy it
+		if (DistanceFromPlayer < DespawnDistance)
+		{
+			Destroy();
+		}
+	}
 }

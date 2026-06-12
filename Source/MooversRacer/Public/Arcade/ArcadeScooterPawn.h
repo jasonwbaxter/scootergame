@@ -58,6 +58,9 @@ public:
 	void OnObstacleHit();
 
 	USkeletalMeshComponent* GetMeshComponent() const { return MeshComponent; }
+	
+	UFUNCTION(BlueprintCallable, Category = "Arcade")
+	UArcadePhysicsComponent* GetPhysicsComponent() const { return ArcadePhysics; }
 
 protected:
 	// Components

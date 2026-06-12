@@ -74,5 +74,26 @@ void AArcadePowerUp::RotateMesh(float DeltaTime)
 
 void AArcadePowerUp::DespawnIfBehindPlayer()
 {
-	// TODO: Check if power-up is behind player, then destroy
+	// Check if this power-up is far behind the player and should be destroyed
+	// This prevents memory leaks from accumulating power-ups
+	AArcadeScooterPawn* PlayerScooter = nullptr;
+	
+	// Find the player scooter
+	for (TActorIterator<AArcadeScooterPawn> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		PlayerScooter = *ActorItr;
+		break;
+	}
+
+	if (PlayerScooter)
+	{
+		float DistanceFromPlayer = (GetActorLocation().X - PlayerScooter->GetActorLocation().X);
+		
+		// If power-up is far behind player, destroy it (use same distance as obstacles)
+		const float DespawnDistance = -500.0f;
+		if (DistanceFromPlayer < DespawnDistance)
+		{
+			Destroy();
+		}
+	}
 }

@@ -32,6 +32,14 @@ enum class EPartRarity : uint8
 	Legendary UMETA(DisplayName = "Legendary")
 };
 
+UENUM(BlueprintType)
+enum class EScooterBrand : uint8
+{
+	KRONOS_MOTORS UMETA(DisplayName = "KRONOS MOTORS"),
+	VELOCE_CLASSICS UMETA(DisplayName = "VELOCE CLASSICS"),
+	THRUST_DYNAMICS UMETA(DisplayName = "THRUST DYNAMICS")
+};
+
 USTRUCT(BlueprintType)
 struct FPartStats : public FTableRowBase
 {
@@ -71,6 +79,9 @@ struct FPart : public FTableRowBase
 	EPartRarity Rarity;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EScooterBrand Brand;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FPartStats Stats;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -78,6 +89,32 @@ struct FPart : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSoftObjectPtr<USkeletalMesh> PartMesh; // For modular parts
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSoftObjectPtr<UTexture2D> ThumbnailImage;
+
+	// ========== VISUAL SPECIFICATIONS ==========
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual Specs")
+	FLinearColor PrimaryColor;  // Brand primary color
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual Specs")
+	FLinearColor AccentColor;   // Brand accent color
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual Specs")
+	float MetallicValue = 0.0f;  // 0.0 = Matte, 1.0 = Mirror
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual Specs")
+	float RoughnessValue = 0.5f; // 0.0 = Polished, 1.0 = Rough
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual Specs")
+	float GlowIntensity = 0.0f;  // For Epic/Legendary glow effects
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual Specs")
+	bool bHasHolographicShift = false;  // For Epic/Legendary iridescent effects
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual Specs")
+	bool bCanRecolor = true;  // Whether part accepts paint color
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Price = 100;
